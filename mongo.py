@@ -2,6 +2,11 @@ import pymongo
 import uuid
 import json
 
+BLUE = '\033[94m'
+GREEN = '\033[92m'
+RED = '\033[91m'
+RESET = '\033[0m'
+
 container_id = uuid.uuid4().hex # will use this to generate the container ids as the containers are created
 
 database_structure = { # just visualizing the database structure; not used
@@ -34,7 +39,7 @@ def create_container():
         container[container_id][item] = int(quantity) # add the item and quantity to the container dictionary with the quantity as an integer type
 
     print("\nNew container created successfully!\n")
-    print(f"Container ID: {container_id}")
+    print(f"Container ID: {GREEN}{container_id}{RESET}")
     print("Container contents:")
     print(json.dumps(container[container_id], indent=4))
 
@@ -50,6 +55,29 @@ def delete_container():
     pass
 
 def py_storage():
+    while True:
+        print("\nWelcome to Py-Storage!")
+        print("1. Create a new container")
+        print("2. Read a container")
+        print("3. Update a container")
+        print("4. Delete a container")
+        print("5. Exit")
+        choice = input("\nEnter your choice: \n")
+
+        if choice == "1":
+            create_container()
+        elif choice == "2":
+            read_container()
+        elif choice == "3":
+            update_container()
+        elif choice == "4":
+            delete_container()
+        elif choice == "5":
+            print("\nThank you for using Py-Storage!")
+            break
+        else:
+            print("\nInvalid choice. Please try again.")
+
     pass
 
 
