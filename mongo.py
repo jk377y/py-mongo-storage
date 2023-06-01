@@ -58,6 +58,14 @@ def delete_container():
     pass
 
 def py_storage():
+    options = {
+        "1": create_container,
+        "2": read_container,
+        "3": update_container,
+        "4": delete_container,
+        "5": exit
+    }
+
     while True:
         print(f"\n{BLUE}Welcome to Py-Mongo!{RESET}\n")
         print(f"1. {GREEN}Create{RESET} a container")
@@ -67,21 +75,25 @@ def py_storage():
         print(f"5. {PURPLE}Exit{RESET}")
         choice = input("\nEnter your choice: \n")
 
-        if choice == "1":
-            create_container()
-        elif choice == "2":
-            read_container()
-        elif choice == "3":
-            update_container()
-        elif choice == "4":
-            delete_container()
-        elif choice == "5":
-            print("\nThank you for using Py-Mongo!")
-            break
+        if choice in options: #trying to improve my DRY execution by using a dictionary to call the functions
+            options[choice]()
         else:
             print("\nInvalid choice. Please try again.")
 
-    pass
+        # if choice == "1":
+        #     create_container()
+        # elif choice == "2":
+        #     read_container()
+        # elif choice == "3":
+        #     update_container()
+        # elif choice == "4":
+        #     delete_container()
+        # elif choice == "5":
+        #     print("\nThank you for using Py-Mongo!")
+        #     break
+        # else:
+        #     print("\nInvalid choice. Please try again.")
+
 
 
 py_storage() # call the main function to run the program
