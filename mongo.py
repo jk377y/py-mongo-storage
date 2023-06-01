@@ -1,8 +1,8 @@
-import pymongo # pymongo is a python library that allows us to connect to MongoDB
-import uuid # uuid is a python library that allows us to generate unique IDs; i will use this to name the containers in the database
+import pymongo
+import uuid
+import json
 
-# going to use something like this data structure for the database:
-container_id = uuid.uuid4().hex # generate a unique ID for the container, there will be multiple containers in the database and the container should be identified uniquely
+container_id = uuid.uuid4().hex
 database_structure = {
     container_id:
         {
@@ -13,9 +13,30 @@ database_structure = {
         }
 }
 
-this_db_username = "admin" # this is the username for the database
-this_db_password = "1LGpnOal2IB6Omh2" # this is the password for the database
-client = pymongo.MongoClient(f"mongodb+srv://{this_db_username}:{this_db_password}@python-mongo-project.pksitq7.mongodb.net/") # this is the connection
-db_name = client["py-mongo"] # this is the name of the database
-collection_name = db_name["containers"] # this is the name of the collection (table) in the database
+this_db_username = "admin"
+this_db_password = "1LGpnOal2IB6Omh2"
+client = pymongo.MongoClient(f"mongodb+srv://{this_db_username}:{this_db_password}@python-mongo-project.pksitq7.mongodb.net/")
+db_name = client["py-mongo"]
+collection_name = db_name["containers"]
 
+def create_container():
+    container_id = uuid.uuid4().hex
+    container = {container_id: {}}
+    print(f"\nCreating container with ID: {container_id}\n")
+    
+    while True:
+        item = input("Enter the name of the item being stored, OR type 'q' to finish: ").lower()
+        if item == "q":
+            break
+
+        quantity = input(f"Enter the quantity of {item}: ")
+        container[container_id][item] = int(quantity)
+
+    print("\nNew container created successfully!\n")
+    print(f"Container ID: {container_id}")
+    print("Container contents:")
+    print(json.dumps(container[container_id], indent=4))
+
+    collection_name.insert_one(container)
+
+create_container()
