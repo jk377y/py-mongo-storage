@@ -40,4 +40,17 @@ def create_container():
 
     collection_name.insert_one(container) # standard mongo insert function to insert the container into the collection
 
-create_container()
+def read_container():
+    pass
+
+def update_container():
+    pass
+
+def delete_container():
+    pass
+
+def py_storage():
+    pass
+
+
+py_storage() # call the main function to run the program
