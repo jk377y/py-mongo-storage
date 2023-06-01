@@ -13,12 +13,9 @@ database_structure = {
         }
 }
 
+this_db_username = "admin" # this is the username for the database
+this_db_password = "1LGpnOal2IB6Omh2" # this is the password for the database
+client = pymongo.MongoClient(f"mongodb+srv://{this_db_username}:{this_db_password}@python-mongo-project.pksitq7.mongodb.net/") # this is the connection
+db_name = client["py-mongo"] # this is the name of the database
+collection_name = db_name["containers"] # this is the name of the collection (table) in the database
 
-#! from docs
-# connect to the database
-client = pymongo.MongoClient("<mongodb_connection_string>") # need to replace <mongodb_connection_string> with the connection string for MongoDB database
-
-db_name = client["<database_name>"] # need to replace <database_name> with the name of the database
-
-# create a collection
-collection_name = db_name["<collection_name>"] # need to replace <collection_name> with the name of the collection
