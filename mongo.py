@@ -1,55 +1,53 @@
 import pymongo
-import uuid
 import json
 
+# Color codes for terminal output
 BLUE = '\033[94m'
-CYAN = '\033[96m'
 GREEN = '\033[92m'
-PURPLE = '\033[95m'
 YELLOW = '\033[93m'
+CYAN = '\033[96m'
 RED = '\033[91m'
-WHITE = '\033[37m'
+PURPLE = '\033[95m'
 RESET = '\033[0m'
-
-container_id = uuid.uuid4().hex # will use this to generate the container ids as the containers are created
-
-database_structure = { # just visualizing the database structure; not used
-    container_id:
-        {
-            "item1": "value",
-            "item2": "value",
-            "item3": "value",
-            "item4": "value"
-        }
-}
 
 this_db_username = "admin"
 this_db_password = "1LGpnOal2IB6Omh2"
-client = pymongo.MongoClient(f"mongodb+srv://{this_db_username}:{this_db_password}@python-mongo-project.pksitq7.mongodb.net/") # this is the atlas cloud cluster connection
-db_name = client["py-mongo"] # this is the database name
-collection_name = db_name["containers"] # this is the collection name
+client = pymongo.MongoClient(f"mongodb+srv://{this_db_username}:{this_db_password}@python-mongo-project.pksitq7.mongodb.net/") # atlas db connection string
+db = client["py-mongo"] # this is the database name
+collection = db["containers"] # this is the collection name
+
 
 def create_container():
-    container_id = uuid.uuid4().hex # generate a new container id when this function is called
-    container = {container_id: {}} # create a new container with the generated id that has an empty dictionary as its value initially
-    print(f"\nCreating container with ID: {GREEN}{container_id}{RESET}") # print the container id to the console has been created
-    
+    container = {}
+    print(f"\nCreating container...") 
     while True:
-        item = input("Enter the name of the item being stored, OR type 'q' to finish: ").lower() # ask for the value of items being stored in the container, or type 'q' to finish
+        item = input("Enter the name of the item being stored, OR type 'q' to finish: ").lower()
         if item == "q":
             break
-
-        quantity = input(f"Enter the quantity of {item}: ") # when an item is entered, ask for the quantity of that item
-        container[container_id][item] = int(quantity) # add the item and quantity to the container dictionary with the quantity as an integer type
-
+        quantity = input(f"Enter the quantity of {item}: ")
+        container[item] = int(quantity)
     print("\nNew container created successfully!")
-    print(f"{GREEN}{container_id}{RESET} contents:")
-    print(json.dumps(container[container_id], indent=4))
+    container_id = collection.insert_one(container).inserted_id # inserted_id is the ObjectId of the newly created container
+    container["_id"] = str(container_id) # convert the ObjectId to a string for serialization
+    container.pop("_id", None)  # remove the _id field from the container dictionary for display purposes in the terminal
+    print(f"Container ID: {GREEN}{container_id}{RESET}")
+    print("Container Contents:")
+    print(json.dumps(container, indent=4))
 
-    collection_name.insert_one(container) # standard mongo insert function to insert the container into the collection
 
 def read_container():
-    pass
+    containers = collection.find()
+    if collection.count_documents({}) == 0:
+        print("\nNo containers found.")
+        return
+    print("\nAll Containers:")
+    for container in containers:
+        container_id = container["_id"]
+        container.pop("_id")  # Remove the _id key from the container_data dictionary
+        print(f"\nContainer ID: {GREEN}{container_id}{RESET}")
+        print("Container Contents:")
+        print(json.dumps(container, indent=4)) # bson.json_util.dumps() is used to convert the ObjectId to a string for serialization
+
 
 def update_container():
     pass
@@ -65,7 +63,6 @@ def py_storage():
         "4": delete_container,
         "5": exit
     }
-
     while True:
         print(f"\n{BLUE}Welcome to Py-Mongo!{RESET}\n")
         print(f"1. {GREEN}Create{RESET} a container")
@@ -74,26 +71,9 @@ def py_storage():
         print(f"4. {RED}Delete{RESET} a container")
         print(f"5. {PURPLE}Exit{RESET}")
         choice = input("\nEnter your choice: \n")
-
-        if choice in options: #trying to improve my DRY execution by using a dictionary to call the functions
+        if choice in options:
             options[choice]()
         else:
             print("\nInvalid choice. Please try again.")
 
-        # if choice == "1":
-        #     create_container()
-        # elif choice == "2":
-        #     read_container()
-        # elif choice == "3":
-        #     update_container()
-        # elif choice == "4":
-        #     delete_container()
-        # elif choice == "5":
-        #     print("\nThank you for using Py-Mongo!")
-        #     break
-        # else:
-        #     print("\nInvalid choice. Please try again.")
-
-
-
-py_storage() # call the main function to run the program
+py_storage()
