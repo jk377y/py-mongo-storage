@@ -1,5 +1,6 @@
 import pymongo
 import json
+import uuid
 
 # Color codes for terminal output
 BLUE = '\033[94m'
@@ -19,7 +20,7 @@ collection = db["containers"] # this is the collection name
 
 def create_container():
     container = {}
-    print(f"\nCreating container...") 
+    print(f"\nCreating container...")
     while True:
         item = input("Enter the name of the item being stored, OR type 'q' to finish: ").lower()
         if item == "q":
@@ -27,9 +28,10 @@ def create_container():
         quantity = input(f"Enter the quantity of {item}: ")
         container[item] = int(quantity)
     print("\nNew container created successfully!")
-    container_id = collection.insert_one(container).inserted_id # inserted_id is the ObjectId of the newly created container
-    container["_id"] = str(container_id) # convert the ObjectId to a string for serialization
-    container.pop("_id", None)  # remove the _id field from the container dictionary for display purposes in the terminal
+    container_id = str(uuid.uuid4())  # Generate a new UUID for the container ID
+    container["_id"] = container_id
+    collection.insert_one(container)
+    container.pop("_id", None)
     print(f"Container ID: {GREEN}{container_id}{RESET}")
     print("Container Contents:")
     print(json.dumps(container, indent=4))
@@ -43,17 +45,50 @@ def read_container():
     print("\nAll Containers:")
     for container in containers:
         container_id = container["_id"]
-        container.pop("_id")  # Remove the _id key from the container_data dictionary
+        container.pop("_id")
         print(f"\nContainer ID: {GREEN}{container_id}{RESET}")
         print("Container Contents:")
-        print(json.dumps(container, indent=4)) # bson.json_util.dumps() is used to convert the ObjectId to a string for serialization
+        print(json.dumps(container, indent=4))
 
 
 def update_container():
     pass
 
+
+
+
 def delete_container():
-    pass
+    containers = collection.find()
+    if collection.count_documents({}) == 0:
+        print("\nNo containers found.")
+        return
+    print("\nAll Containers:")
+    container_list = []
+    for container in containers:
+        container_id = container["_id"]
+        container_list.append(container)
+        container_copy = container.copy() #needed a copy to remove the _id key from the dictionary for display, but need to preserve the original for deletion
+        container_copy.pop("_id", None)  # remove the _id key from the container_copy
+        print(f"\nContainer ID: {GREEN}{container_id}{RESET}")
+        print("Container Contents:")
+        print(json.dumps(container_copy, indent=4))
+    container_id = input("\nEnter the ID of the container you wish to delete: ")
+    container_to_delete = None
+    for container in container_list:
+        if container["_id"] == container_id:
+            container_to_delete = container
+            break
+    if container_to_delete:
+        confirmation = input(f"\n{RED}Are you sure you want to delete container{RESET} {GREEN}{container_id}{RESET}? {YELLOW}(yes/no):{RESET} ")
+        if confirmation.lower() == "yes":
+            collection.delete_one({"_id": container_id})
+            print(f"\nContainer {GREEN}{container_id}{RESET} has been deleted successfully.")
+        else:
+            print(f"\nDeletion of container {GREEN}{container_id}{RESET} has been canceled.")
+    else:
+        print(f"\nContainer {GREEN}{container_id}{RESET} not found.")
+
+
 
 def py_storage():
     options = {
