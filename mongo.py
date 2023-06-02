@@ -28,8 +28,8 @@ def create_container():
     container = {}
     print(f"\nCreating container...")
     while True:
-        item = input("Enter the name of the item being stored, OR type 'q' to finish: ").lower()
-        if item == "q":
+        item = input("Enter the name of the item being stored, OR type 'f' to finish: ").lower()
+        if item == "f":
             break
         quantity = input(f"Enter the quantity of {item}: ")
         container[item] = int(quantity)
