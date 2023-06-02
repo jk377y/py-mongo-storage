@@ -150,7 +150,7 @@ def py_storage():
     while True:
         print(f"\n{BLUE}Welcome to Py-Mongo!{RESET}\n")
         print(f"1. {GREEN}Create{RESET} a container")
-        print(f"2. {YELLOW}Read{RESET}   a container")
+        print(f"2. {YELLOW}Read{RESET} all containers")
         print(f"3. {CYAN}Update{RESET} a container")
         print(f"4. {RED}Delete{RESET} a container")
         print(f"5. {PURPLE}Exit{RESET}")
